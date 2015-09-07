@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+
+    <Button
+        android:id="@+id/plus_button_edit_start"
+        android:onClick="addNewTaskStart"
+        style="@style/plus_button_style" />
+
+    <EditText
+        android:id="@+id/new_task_edit_text"
+        android:hint="@string/new_task_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:id="@+id/add_new_task_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginLeft="16dp"
+        android:gravity="center_vertical"
+        android:text="@string/add_new_task"
+        android:textSize="24sp"
+        android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/plus_button_edit_stop"
+        style="@style/plus_button_style"
+        android:visibility="gone" />
+
+
+</LinearLayout>

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Every Day Tasks</string>
+    <string name="add_new_task">Add new task!</string>
+    <string name="action_settings">Settings</string>
+    <string name="new_task_hint">Your new task</string>
+    <string name="checkbox_hint">Task name</string>
+    <string name="empty_task_toast">You can\'t make empty task</string>
+</resources>
