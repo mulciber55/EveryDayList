@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent" android:id="@+id/add_task_linear_layout">
 
 
 
     <Button
         android:id="@+id/plus_button_edit_start"
-        android:onClick="addNewTaskStart"
         style="@style/plus_button_style" />
 
     <EditText

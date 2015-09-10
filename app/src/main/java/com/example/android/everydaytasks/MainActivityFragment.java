@@ -19,35 +19,99 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.everydaytasks.data.Task;
+import com.example.android.everydaytasks.data.TaskDataSource;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
-    ArrayAdapter<String> listFragmentAdapter;
-    ArrayList<String> taskList = new ArrayList<String>(Arrays.asList("Task 1", "Task 2"));
+    CheckBoxAdapter checkboxFragmentAdapter;
+    ArrayList<Task> taskList;
+    TaskDataSource myTaskDatabase;
+    View rootView;
+    ListView listView;
+    LinearLayout addTask_on_layout;
+    LinearLayout addTask_on_foot;
 
     public MainActivityFragment() {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        myTaskDatabase = new TaskDataSource(getActivity());
+        myTaskDatabase.open();
+        taskList = myTaskDatabase.getAllTasks();
+
+        // Add this line in order for this fragment to handle menu events.
+        // setHasOptionsMenu(true);
+    }
+
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        listFragmentAdapter = new CheckBoxAdapter(
+
+        checkboxFragmentAdapter = new CheckBoxAdapter(
                 getActivity(),
                 taskList);
         //connect this fragment class with xml file
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+        rootView = inflater.inflate(R.layout.fragment_main, container, false);
         //make reference to List View
-        ListView listView = (ListView) rootView.findViewById(R.id.main_list_view);
-        listView.setAdapter(listFragmentAdapter);
-        //add footer
-        LinearLayout addTask = (LinearLayout) inflater.inflate(R.layout.add_task, container, false);
-        listView.addFooterView(addTask);
-        //references to elements from checkbox, preparation to animate
+        listView = (ListView) rootView.findViewById(R.id.main_list_view);
+        //set adapter
+        listView.setAdapter(checkboxFragmentAdapter);
+        addTask_on_layout = (LinearLayout) rootView.findViewById(R.id.add_task_on_fragment);
+        addTask_on_foot = (LinearLayout)inflater.inflate(R.layout.add_task, container, false);
+
+
+
+        if(taskList.size() != 0){
+            listView.addFooterView(addTask_on_foot);
+            listenButtons(addTask_on_foot);
+        }else {
+
+            addTask_on_layout.setVisibility(View.VISIBLE);
+            listenButtons(addTask_on_layout);
+        }
+
+
+        return rootView;
+    }
+
+            /**
+         * Custom Adapter connecting arrayList od Strings with CheckBox
+         */
+    public class CheckBoxAdapter extends ArrayAdapter<Task> {
+
+        public CheckBoxAdapter(Context context, ArrayList<Task> tasks) {
+            super(context, 0, tasks);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.check_box, parent, false);
+            }
+            CheckBox checkBox = (CheckBox) convertView;
+            Task task = getItem(position);
+            String title = task.title;
+            boolean isChecked = task.checked;
+            checkBox.setText(title);
+            checkBox.setChecked(isChecked);
+            return checkBox;
+        }
+
+    }
+
+    public void listenButtons(LinearLayout addTask){
+
+//references to elements from checkbox, preparation to animate
         final Button plusButtonEditStart = (Button) addTask.findViewById(R.id.plus_button_edit_start);
         final Button plusButtonEditStop = (Button) addTask.findViewById(R.id.plus_button_edit_stop);
         final EditText newTaskEditText = (EditText) addTask.findViewById(R.id.new_task_edit_text);
@@ -83,29 +147,6 @@ public class MainActivityFragment extends Fragment {
                 return false;
             }
         });
-
-        return rootView;
-    }
-
-    /**
-     * Custom Adapter connecting arrayList od Strings with CheckBox
-     */
-    public class CheckBoxAdapter extends ArrayAdapter<String> {
-
-        public CheckBoxAdapter(Context context, ArrayList<String> boxes) {
-            super(context, 0, boxes);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.check_box, parent, false);
-            }
-            CheckBox checkBox = (CheckBox) convertView;
-            String checkBoxText = getItem(position);
-            checkBox.setText(checkBoxText);
-            return checkBox;
-        }
 
     }
 
@@ -161,7 +202,6 @@ public class MainActivityFragment extends Fragment {
      *@param addNewTaskTextBox Text VIew show after slide
      *
      */
-
     public void animateToLeft(final Button plusButtonEditStart, final Button plusButtonEditStop, final EditText newTaskEditText, final TextView addNewTaskTextBox) {
         //reference to Animation
         final Animation slideAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.plus_button_move_to_left);
@@ -199,11 +239,23 @@ public class MainActivityFragment extends Fragment {
             //Start animation
             plusButtonEditStop.startAnimation(slideAnimation);
             //add new checkbox
-            taskList.add(textToInsertInCheckbox);
+            if(taskList.size() == 0){
+                addTask_on_layout.setVisibility(View.GONE);
+                listView.addFooterView(addTask_on_foot);
+                listenButtons(addTask_on_foot);
+            }
+            Task quickTask = myTaskDatabase.createTask(textToInsertInCheckbox, false, 0);
+            taskList.add(quickTask);
             //erase text from EditBox
             newTaskEditText.clearComposingText();
             newTaskEditText.setText("");
         }
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        myTaskDatabase.close();
     }
 
 
