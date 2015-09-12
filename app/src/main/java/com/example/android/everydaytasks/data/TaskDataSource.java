@@ -35,9 +35,9 @@ public class TaskDataSource {
 
     /**
      * Method create new task row in Database and new object.
-     * @param title
-     * @param checked
-     * @param order
+     * @param title title of checkbox
+     * @param checked checked/unchecked checkbnox
+     * @param order witch one should be on list
      * @return created Task object
      */
     public Task createTask(String title, boolean checked, int order) {
@@ -70,21 +70,29 @@ public class TaskDataSource {
 
     /**
      * Method delete row based on ID
-     * @param task
+     * @param task task witch should be removed
      */
     public void deleteTask(Task task) {
         long id = task.id;
-        //System.out.println("Comment deleted with id: " + id);
         db.delete(TaskTable.TABLE_NAME, TaskColumns._ID
                 + " = " + id, null);
     }
 
+    public void updateTask(Task task){
+        ContentValues values = new ContentValues();
+        values.put(TaskColumns.TITLE, task.title);
+        values.put(TaskColumns.CHECKED, task.checked);
+        values.put(TaskColumns.ORDER, task.order);
+        db.update(TaskTable.TABLE_NAME, values,TaskColumns._ID + " = " + task.id,null);
+
+    }
+
     /**
      * Method return all task from database
-     * @return
+     * @return collection of all task in database
      */
     public ArrayList<Task> getAllTasks() {
-        ArrayList<Task> tasks = new ArrayList<Task>();
+        ArrayList<Task> tasks = new ArrayList<>();
 
         Cursor cursor = db.query(TaskTable.TABLE_NAME,
                 allColumns, null, null, null, null, null);
@@ -102,7 +110,7 @@ public class TaskDataSource {
 
     /**
      * make new Task object from cursor
-     * @param cursor
+     * @param cursor cursor contained taks from database
      * @return Task object from cursor
      */
     private Task cursorToTask(Cursor cursor) {
@@ -111,13 +119,11 @@ public class TaskDataSource {
         boolean checked = (cursor.getInt(2) != 0);
         int order = cursor.getInt(3);
 
-        Task task = new Task(
+        return  new Task(
                 id,
                 title,
                 checked,
                 order
         );
-
-        return task;
     }
 }

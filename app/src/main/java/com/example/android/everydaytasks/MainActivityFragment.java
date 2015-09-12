@@ -13,6 +13,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -99,13 +101,21 @@ public class MainActivityFragment extends Fragment {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.check_box, parent, false);
             }
             CheckBox checkBox = (CheckBox) convertView;
-            Task task = getItem(position);
+            final Task task = getItem(position);
             String title = task.title;
             boolean isChecked = task.checked;
             checkBox.setText(title);
             checkBox.setChecked(isChecked);
+            checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    task.checked = isChecked;
+                    myTaskDatabase.updateTask(task);
+                }
+            });
             return checkBox;
         }
+
+
 
     }
 
