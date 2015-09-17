@@ -10,11 +10,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -32,7 +28,7 @@ import java.util.ArrayList;
 public class MainActivityFragment extends Fragment {
     CheckBoxAdapter checkboxFragmentAdapter;
     ArrayList<Task> taskList;
-    TaskDataSource myTaskDatabase;
+    private TaskDataSource mTaskDatabase;
     View rootView;
     ListView listView;
     LinearLayout addTask_on_layout;
@@ -43,9 +39,9 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        myTaskDatabase = new TaskDataSource(getActivity());
-        myTaskDatabase.open();
-        taskList = myTaskDatabase.getAllTasks();
+        mTaskDatabase = new TaskDataSource(getActivity());
+        mTaskDatabase.open();
+        taskList = mTaskDatabase.getAllTasks();
 
         // Add this line in order for this fragment to handle menu events.
         // setHasOptionsMenu(true);
@@ -73,38 +69,7 @@ public class MainActivityFragment extends Fragment {
         return rootView;
     }
 
-            /**
-         * Custom Adapter connecting arrayList od Strings with CheckBox
-         */
-    public class CheckBoxAdapter extends ArrayAdapter<Task> {
 
-        public CheckBoxAdapter(Context context, ArrayList<Task> tasks) {
-            super(context, 0, tasks);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.check_box, parent, false);
-            }
-            CheckBox checkBox = (CheckBox) convertView;
-            final Task task = getItem(position);
-            String title = task.getTitle();
-            boolean isChecked = task.isChecked();
-            checkBox.setText(title);
-            checkBox.setChecked(isChecked);
-            checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    task.setChecked(isChecked);
-                    myTaskDatabase.updateTask(task);
-                }
-            });
-            return checkBox;
-        }
-
-
-
-    }
 
     public void listenButtons(LinearLayout addTask){
 
@@ -236,7 +201,7 @@ public class MainActivityFragment extends Fragment {
             //Start animation
             plusButtonEditStop.startAnimation(slideAnimation);
             //add new checkbox
-            Task quickTask = myTaskDatabase.createTask(textToInsertInCheckbox, false, 0);
+            Task quickTask = mTaskDatabase.createTask(textToInsertInCheckbox, false, 0);
             taskList.add(quickTask);
             //erase text from EditBox
             newTaskEditText.clearComposingText();
@@ -247,7 +212,7 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        myTaskDatabase.close();
+        mTaskDatabase.close();
     }
 
 
