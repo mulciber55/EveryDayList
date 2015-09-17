@@ -73,17 +73,17 @@ public class TaskDataSource {
      * @param task task witch should be removed
      */
     public void deleteTask(Task task) {
-        long id = task.id;
+        long id = task.getId();
         db.delete(TaskTable.TABLE_NAME, TaskColumns._ID
                 + " = " + id, null);
     }
 
     public void updateTask(Task task){
         ContentValues values = new ContentValues();
-        values.put(TaskColumns.TITLE, task.title);
-        values.put(TaskColumns.CHECKED, task.checked);
-        values.put(TaskColumns.ORDER, task.order);
-        db.update(TaskTable.TABLE_NAME, values,TaskColumns._ID + " = " + task.id,null);
+        values.put(TaskColumns.TITLE, task.getTitle());
+        values.put(TaskColumns.CHECKED, task.isChecked());
+        values.put(TaskColumns.ORDER, task.getOrder());
+        db.update(TaskTable.TABLE_NAME, values,TaskColumns._ID + " = " + task.getId(),null);
 
     }
 

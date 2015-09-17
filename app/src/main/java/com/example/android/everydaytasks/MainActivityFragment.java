@@ -103,13 +103,13 @@ public class MainActivityFragment extends Fragment {
             }
             CheckBox checkBox = (CheckBox) convertView;
             final Task task = getItem(position);
-            String title = task.title;
-            boolean isChecked = task.checked;
+            String title = task.getTitle();
+            boolean isChecked = task.isChecked();
             checkBox.setText(title);
             checkBox.setChecked(isChecked);
             checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    task.checked = isChecked;
+                    task.setChecked(isChecked);
                     myTaskDatabase.updateTask(task);
                 }
             });
