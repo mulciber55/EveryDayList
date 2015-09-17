@@ -36,7 +36,6 @@ public class MainActivityFragment extends Fragment {
     View rootView;
     ListView listView;
     LinearLayout addTask_on_layout;
-    LinearLayout addTask_on_foot;
 
     public MainActivityFragment() {
     }
@@ -69,20 +68,7 @@ public class MainActivityFragment extends Fragment {
         //set adapter
         listView.setAdapter(checkboxFragmentAdapter);
         addTask_on_layout = (LinearLayout) rootView.findViewById(R.id.add_task_on_fragment);
-        addTask_on_foot = (LinearLayout)inflater.inflate(R.layout.add_task, container, false);
-
-
-
-        if(taskList.size() != 0){
-            listView.setVisibility(View.VISIBLE);
-            listView.addFooterView(addTask_on_foot);
-            listenButtons(addTask_on_foot);
-        }else {
-            listView.setVisibility(View.GONE);
-            addTask_on_layout.setVisibility(View.VISIBLE);
-            listenButtons(addTask_on_layout);
-        }
-
+        listenButtons(addTask_on_layout);
 
         return rootView;
     }
@@ -249,13 +235,6 @@ public class MainActivityFragment extends Fragment {
             newTaskEditText.setVisibility(View.INVISIBLE);
             //Start animation
             plusButtonEditStop.startAnimation(slideAnimation);
-            //if that was first checkbox switch to another view.
-            if(taskList.size() == 0){
-                addTask_on_layout.setVisibility(View.GONE);
-                listView.setVisibility(View.VISIBLE);
-                listView.addFooterView(addTask_on_foot);
-                listenButtons(addTask_on_foot);
-            }
             //add new checkbox
             Task quickTask = myTaskDatabase.createTask(textToInsertInCheckbox, false, 0);
             taskList.add(quickTask);
