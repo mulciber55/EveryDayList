@@ -3,6 +3,8 @@ package com.example.android.everydaytasks;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +13,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,16 +23,18 @@ import com.example.android.everydaytasks.data.Task;
 import com.example.android.everydaytasks.data.TaskDataSource;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
-    CheckBoxAdapter checkboxFragmentAdapter;
-    ArrayList<Task> taskList;
+    private CheckBoxAdapter mCheckboxFragmentAdapter;
+    private ArrayList<Task> taskList;
     private TaskDataSource mTaskDatabase;
-    View rootView;
-    ListView listView;
+    private View rootView;
+    private RecyclerView mTasksRecyclerView;
+    private CheckBoxAdapter mAdpter;
     LinearLayout addTask_on_layout;
 
     public MainActivityFragment() {
@@ -41,7 +45,7 @@ public class MainActivityFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mTaskDatabase = new TaskDataSource(getActivity());
         mTaskDatabase.open();
-        taskList = mTaskDatabase.getAllTasks();
+
 
         // Add this line in order for this fragment to handle menu events.
         // setHasOptionsMenu(true);
@@ -53,25 +57,28 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
 
 
-        checkboxFragmentAdapter = new CheckBoxAdapter(
-                getActivity(),
-                taskList);
         //connect this fragment class with xml file
 
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        //make reference to List View
-        listView = (ListView) rootView.findViewById(R.id.main_list_view);
+        //make reference to RecyclerView
+        mTasksRecyclerView = (RecyclerView) rootView.findViewById(R.id.main_recycler_view);
+        //Give Layout Manager to RecyclerView
+        mTasksRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         //set adapter
-        listView.setAdapter(checkboxFragmentAdapter);
+        updateUI();
         addTask_on_layout = (LinearLayout) rootView.findViewById(R.id.add_task_on_fragment);
         listenButtons(addTask_on_layout);
 
         return rootView;
     }
 
+    private void updateUI() {
+        taskList = mTaskDatabase.getAllTasks();
+        mAdpter = new CheckBoxAdapter(taskList);
+        mTasksRecyclerView.setAdapter(mAdpter);
+    }
 
-
-    public void listenButtons(LinearLayout addTask){
+    public void listenButtons(LinearLayout addTask) {
 
 //references to elements from checkbox, preparation to animate
         final Button plusButtonEditStart = (Button) addTask.findViewById(R.id.plus_button_edit_start);
@@ -86,7 +93,7 @@ public class MainActivityFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                animateToRight(plusButtonEditStart,plusButtonEditStop,newTaskEditText,addNewTaskTextBox);
+                animateToRight(plusButtonEditStart, plusButtonEditStop, newTaskEditText, addNewTaskTextBox);
             }
         });
 
@@ -102,7 +109,7 @@ public class MainActivityFragment extends Fragment {
         newTaskEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER){
+                if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                     animateToLeft(plusButtonEditStart, plusButtonEditStop, newTaskEditText, addNewTaskTextBox);
                     return true;
                 }
@@ -115,11 +122,10 @@ public class MainActivityFragment extends Fragment {
     /**
      * Method animate adding checkbox
      *
-     *@param plusButtonEditStart button on left, slide to right and hide
-     *@param plusButtonEditStop button shows after start button slide
-     *@param newTaskEditText EditText show after slide
-     *@param addNewTaskTextBox Text VIew hide after slide
-     *
+     * @param plusButtonEditStart button on left, slide to right and hide
+     * @param plusButtonEditStop  button shows after start button slide
+     * @param newTaskEditText     EditText show after slide
+     * @param addNewTaskTextBox   Text VIew hide after slide
      */
     public void animateToRight(final Button plusButtonEditStart, final Button plusButtonEditStop, final EditText newTaskEditText, final TextView addNewTaskTextBox) {
 
@@ -140,7 +146,7 @@ public class MainActivityFragment extends Fragment {
                 addNewTaskTextBox.setVisibility(View.GONE);
                 newTaskEditText.setVisibility(View.VISIBLE);
                 //show keyboard
-                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.toggleSoftInputFromWindow(newTaskEditText.getWindowToken(), InputMethodManager.SHOW_FORCED, 0);
                 newTaskEditText.requestFocus();
 
@@ -158,11 +164,10 @@ public class MainActivityFragment extends Fragment {
     /**
      * Method animate adding checkbox
      *
-     *@param plusButtonEditStart button on left shows after stop button slide
-     *@param plusButtonEditStop button slide to left and hide
-     *@param newTaskEditText EditText hide after slide
-     *@param addNewTaskTextBox Text VIew show after slide
-     *
+     * @param plusButtonEditStart button on left shows after stop button slide
+     * @param plusButtonEditStop  button slide to left and hide
+     * @param newTaskEditText     EditText hide after slide
+     * @param addNewTaskTextBox   Text VIew show after slide
      */
     public void animateToLeft(final Button plusButtonEditStart, final Button plusButtonEditStop, final EditText newTaskEditText, final TextView addNewTaskTextBox) {
         //reference to Animation
@@ -194,7 +199,7 @@ public class MainActivityFragment extends Fragment {
             Toast.makeText(getActivity(), getActivity().getString(R.string.empty_task_toast), Toast.LENGTH_LONG).show();
         } else {
             //hide keyboard
-            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(newTaskEditText.getWindowToken(), 0);
             //hide EditText (looks beater that way)
             newTaskEditText.setVisibility(View.INVISIBLE);
@@ -209,8 +214,68 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
+    private class TaskHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener {
+        private CheckBox mCheckBox;
+        private Task mTask;
+
+        public TaskHolder(View itemView) {
+            super(itemView);
+            itemView.setOnClickListener(this);
+
+            mCheckBox = (CheckBox) itemView.findViewById(R.id.simple_checkbox);
+        }
+
+        public void bindTask(Task task) {
+            mTask = task;
+            mCheckBox.setText(mTask.getTitle());
+            mCheckBox.setChecked(mTask.isChecked());
+        }
+
+        //listener holding checkBox checking
+        @Override
+        public void onClick(View v) {
+            CheckBox checkBox = (CheckBox) v;
+            mTask.setChecked(checkBox.isChecked());
+            mTaskDatabase.updateTask(mTask);
+            updateUI();
+        }
+    }
+
+
+    /**
+     * Custom Adapter connecting Tasks list to CheckBox
+     */
+    private class CheckBoxAdapter extends RecyclerView.Adapter<TaskHolder> {
+
+        private List<com.example.android.everydaytasks.data.Task> mTasks;
+
+        public CheckBoxAdapter(List<Task> tasks) {
+            mTasks = tasks;
+        }
+
+        @Override
+        public TaskHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from((getActivity()));
+            View view = layoutInflater.inflate(R.layout.check_box, parent, false);
+            return new TaskHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(TaskHolder holder, int position) {
+            Task task = mTasks.get(position);
+            holder.bindTask(task);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mTasks.size();
+        }
+
+    }
+
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         mTaskDatabase.close();
     }

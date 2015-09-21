@@ -6,10 +6,10 @@
     >
 
 
-<ListView
-    android:id="@+id/main_list_view"
+<android.support.v7.widget.RecyclerView
+    android:id="@+id/main_recycler_view"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="400dp"
     android:layout_alignParentTop="true"
     android:layout_centerHorizontal="true"
     android:divider="@null"
@@ -22,13 +22,13 @@
     tools:context=".MainActivityFragment">
 
 
-</ListView>
+</android.support.v7.widget.RecyclerView>
 
 <include
     android:id="@+id/add_task_on_fragment"
     layout="@layout/add_task"
 
-    android:layout_below="@id/main_list_view"
+    android:layout_below="@id/main_recycler_view"
     android:layout_height="100dp"
     android:layout_width="match_parent"/>
 </RelativeLayout>
